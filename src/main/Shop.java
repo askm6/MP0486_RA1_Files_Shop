@@ -225,7 +225,7 @@ public class Shop {
 	/**
 	 * write inventory to file
 	 */
-	private boolean writeInventory() {
+	public boolean writeInventory() {
 		return dao.writeInventory(inventory);
 	}
 
