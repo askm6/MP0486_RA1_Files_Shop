@@ -119,6 +119,7 @@ public class Shop {
 			System.out.println("===========================");
 			System.out.println("Menu principal miTienda.com");
 			System.out.println("===========================");
+			System.out.println("0) Exportar inventario");
 			System.out.println("1) Contar caja");
 			System.out.println("2) Añadir producto");
 			System.out.println("3) Añadir stock");
@@ -133,6 +134,9 @@ public class Shop {
 			opcion = scanner.nextInt();
 
 			switch (opcion) {
+			case 0:
+				shop.exportInventory();
+				break;
 			case 1:
 				shop.showCash();
 				break;
@@ -227,6 +231,19 @@ public class Shop {
 	 */
 	public boolean writeInventory() {
 		return dao.writeInventory(inventory);
+	}
+	
+	/**
+	 * show current total cash
+	 */
+	private void exportInventory() {
+		Boolean validation = writeInventory();
+		if (validation == false) {
+			System.out.println("Inventario no exportado");
+		}else {
+			System.out.println("Inventario exportado con exito");
+		}
+		
 	}
 
 	/**
