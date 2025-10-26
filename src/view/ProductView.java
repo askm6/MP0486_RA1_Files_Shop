@@ -54,9 +54,6 @@ public class ProductView extends JDialog implements ActionListener{
 		
 		// main configuration dialog
 		switch (option) {
-		case Constants.OPTION_EXPORT_INVENTORY:
-			setTitle("Añadir Producto");			
-			break;
 		case Constants.OPTION_ADD_PRODUCT:
 			setTitle("Añadir Producto");			
 			break;
@@ -153,23 +150,6 @@ public class ProductView extends JDialog implements ActionListener{
 		if (e.getSource() == okButton) {
 			Product product;
 			switch (this.option) {
-			case Constants.OPTION_EXPORT_INVENTORY:
-				// check product exists
-				boolean validation = shop.writeInventory();
-				
-				if (validation == false) {
-					JOptionPane.showMessageDialog(null, "Inventario no exportado", "Error",
-							JOptionPane.ERROR_MESSAGE);
-					
-				} else {					
-					JOptionPane.showMessageDialog(null, "Inventario exportado con exito", "Information",
-							JOptionPane.INFORMATION_MESSAGE);
-					// release current screen
-					dispose();	
-				}
-				
-				break;
-				
 			case Constants.OPTION_ADD_PRODUCT:
 				// check product does not exist
 				product = shop.findProduct(textFieldName.getText());
