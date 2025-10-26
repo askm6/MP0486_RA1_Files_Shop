@@ -47,7 +47,7 @@ public class DaoImplFile implements Dao {
 		ArrayList<Product> inventory = new ArrayList<Product>();
 		
 		// locate file, path and name
-		File f = new File(System.getProperty("user.dir") + File.separator + "files/inputInventory.txt");
+		File f = new File(System.getProperty("user.dir") + File.separator + "files" + File.separator + "inputInventory.txt");
 
 		try {
 			// wrap in proper classes
@@ -116,7 +116,7 @@ public class DaoImplFile implements Dao {
 	public boolean writeInventory(ArrayList<Product> inventory){
 		// define file name based on date
 		LocalDate myObj = LocalDate.now();
-		String fileName = "sales_" + myObj.toString() + ".txt";
+		String fileName = "inventory_" + myObj.toString() + ".txt";
 
 		// locate file, path and name
 		File f = new File(System.getProperty("user.dir") + File.separator + "files" + File.separator + fileName);
@@ -145,7 +145,7 @@ public class DaoImplFile implements Dao {
 			// format line TO BE ->
 			// Total number of products:2;
 			// build total of products line
-			StringBuilder totalLine = new StringBuilder("Total number of products:" + counterProduct + ";");
+			StringBuilder totalLine = new StringBuilder("Total number of products:" + --counterProduct + ";");
 			pw.write(totalLine.toString());
 			fw.write("\n");
 			
