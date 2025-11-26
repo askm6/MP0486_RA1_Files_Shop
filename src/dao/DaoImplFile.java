@@ -31,18 +31,6 @@ public class DaoImplFile implements Dao {
 	}
 
 	@Override
-	public void disconnect() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public Employee getEmployee(int employeeId, String password) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public ArrayList<Product> getInventory() {
 		ArrayList<Product> inventory = new ArrayList<Product>();
 		
@@ -161,6 +149,12 @@ public class DaoImplFile implements Dao {
 	}
 
 	@Override
+	public Employee getEmployee(int employeeId, String password) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public void addProduct(Product product) {
 		// TODO Auto-generated method stub
 		
@@ -176,6 +170,12 @@ public class DaoImplFile implements Dao {
 	public void deleteProduct(int productId) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void disconnect() {
+		// TODO Auto-generated method stub
+
 	}
 
 }
