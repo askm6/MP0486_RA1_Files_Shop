@@ -557,7 +557,6 @@ public class Shop {
 		} else {
 			return false;
 		}
-
 	}
 
 	/**
@@ -572,7 +571,5 @@ public class Shop {
 			}
 		}
 		return null;
-
 	}
-
 }

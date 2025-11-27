@@ -35,6 +35,7 @@ public class DaoImplJDBC implements Dao {
 	public ArrayList<Product> getInventory() {
 		ArrayList<Product> inventory = new ArrayList<>();
 		String query = "select * from inventory";
+		connect();
 
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			try (ResultSet rs = ps.executeQuery()) {
@@ -44,13 +45,16 @@ public class DaoImplJDBC implements Dao {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		} finally {
+	        disconnect();
+	    }
 		return inventory;
 	}
 
 	@Override
 	public boolean writeInventory(ArrayList<Product> inventory) {
 		String query = "INSERT INTO historical_inventory (id_product, name, wholesalerPrice, available, stock, created_at) VALUES (?, ?, ?, ?, ?, ?)";
+		connect();
 		
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			
@@ -74,14 +78,17 @@ public class DaoImplJDBC implements Dao {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
-		}
+		} finally {
+	        disconnect();
+	    }
 	}
 
 	@Override
 	public Employee getEmployee(int employeeId, String password) {
 		Employee employee = null;
 		String query = "select * from employee where employeeId= ? and password = ? ";
-
+		connect();
+		
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setInt(1, employeeId);
 			ps.setString(2, password);
@@ -94,13 +101,16 @@ public class DaoImplJDBC implements Dao {
 		} catch (SQLException e) {
 			// in case error in SQL
 			e.printStackTrace();
-		}
+		} finally {
+	        disconnect();
+	    }
 		return employee;
 	}
 
 	@Override
 	public void addProduct(Product product) {
 		String query = "INSERT INTO inventory (id, name, wholesalerPrice, available, stock) VALUES (?, ?, ?, ?, ?)";
+		connect();
 
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			ps.setInt(1, product.getId());
@@ -113,16 +123,18 @@ public class DaoImplJDBC implements Dao {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		} finally {
+	        disconnect();
+	    }
 
 	}
 
 	@Override
 	public void updateProduct(Product product) {
 		String query = "UPDATE inventory SET name = ?, wholesalerPrice = ?, available = ?, stock = ? WHERE id = ?";
+		connect();
 
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
-
 			ps.setString(1, product.getName());
 			ps.setDouble(2, product.getWholesalerPrice().getValue());
 			ps.setBoolean(3, product.isAvailable());
@@ -133,12 +145,15 @@ public class DaoImplJDBC implements Dao {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		} finally {
+	        disconnect();
+	    }
 	}
 
 	@Override
 	public void deleteProduct(int productId) {
 		String query = "DELETE FROM inventory WHERE id = ?";
+		connect();
 
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 
@@ -147,7 +162,9 @@ public class DaoImplJDBC implements Dao {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		} finally {
+	        disconnect();
+	    }
 	}
 
 	@Override
