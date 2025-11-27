@@ -32,7 +32,7 @@ public class Shop {
 
 	final static double TAX_RATE = 1.04;
 	
-	private Dao dao = new DaoImplFile();
+	private Dao dao = new DaoImplJDBC();
 
 	public Shop() {
 		inventory = new ArrayList<Product>();
@@ -511,10 +511,42 @@ public class Shop {
 			return;
 		}
 		inventory.add(product);
+		dao.addProduct(product);
 		numberProducts++;
 	}
 	
-	
+	/**
+	 * update a product in inventory
+	 * 
+	 * @param product
+	 */
+	public void updateProduct(Product product) {
+	    for (int i = 0; i < inventory.size(); i++) {
+	        if (inventory.get(i).getId() == product.getId()) {
+	        	inventory.get(i).setName(product.getName());
+	        	inventory.get(i).setWholesalerPrice(product.getWholesalerPrice());
+	        	inventory.get(i).setAvailable(product.isAvailable());
+	        	inventory.get(i).setStock(product.getStock());
+	            break;
+	        }
+	    }
+		dao.updateProduct(product);
+	}
+
+	/**
+	 * delete a product in inventory
+	 * 
+	 * @param product
+	 */
+	public void deleteProduct(int productId) {
+		for (int i = 0; i < inventory.size(); i++) {
+		    if (inventory.get(i).getId() == productId) {
+		        inventory.remove(i);
+		        break;
+		    }
+		}
+		dao.deleteProduct(productId);
+	}
 
 	/**
 	 * check if inventory is full or not

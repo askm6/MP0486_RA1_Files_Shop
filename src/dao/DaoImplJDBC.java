@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import model.Amount;
@@ -38,7 +39,7 @@ public class DaoImplJDBC implements Dao {
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 			try (ResultSet rs = ps.executeQuery()) {
 				while (rs.next()) {
-					inventory.add(new Product(rs.getString(2), new Amount(rs.getDouble(3)), true, rs.getInt(5)));
+					inventory.add(new Product(rs.getString("name"), new Amount(rs.getDouble("wholesalerPrice")), true, rs.getInt("stock")));
 				}
 			}
 		} catch (SQLException e) {
@@ -49,15 +50,19 @@ public class DaoImplJDBC implements Dao {
 
 	@Override
 	public boolean writeInventory(ArrayList<Product> inventory) {
-		String query = "INSERT INTO historical_inventory (name, amount, active, stock) VALUES (?, ?, ?, ?)";
-
+		String query = "INSERT INTO historical_inventory (id_product, name, wholesalerPrice, available, stock, created_at) VALUES (?, ?, ?, ?, ?, ?)";
+		
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
+			
+			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
 			for (Product p : inventory) {
-				ps.setString(1, p.getName());
-				ps.setDouble(2, p.getPublicPrice().getValue());
-				ps.setBoolean(3, p.isAvailable());
-				ps.setInt(4, p.getStock());
+				ps.setInt(1, p.getId());
+				ps.setString(2, p.getName());
+				ps.setDouble(3, p.getWholesalerPrice().getValue());
+				ps.setBoolean(4, p.isAvailable());
+				ps.setInt(5, p.getStock());
+				ps.setTimestamp(6, timestamp);
 
 				ps.addBatch();
 			}
@@ -95,13 +100,14 @@ public class DaoImplJDBC implements Dao {
 
 	@Override
 	public void addProduct(Product product) {
-		String query = "INSERT INTO inventory (name, amount, active, stock) VALUES (?, ?, ?, ?)";
+		String query = "INSERT INTO inventory (id, name, wholesalerPrice, available, stock) VALUES (?, ?, ?, ?, ?)";
 
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
-			ps.setString(1, product.getName());
-			ps.setDouble(2, product.getPublicPrice().getValue());
-			ps.setBoolean(3, product.isAvailable());
-			ps.setInt(4, product.getStock());
+			ps.setInt(1, product.getId());
+			ps.setString(2, product.getName());
+			ps.setDouble(3, product.getWholesalerPrice().getValue());
+			ps.setBoolean(4, product.isAvailable());
+			ps.setInt(5, product.getStock());
 
 			ps.executeUpdate();
 
@@ -113,12 +119,12 @@ public class DaoImplJDBC implements Dao {
 
 	@Override
 	public void updateProduct(Product product) {
-		String query = "UPDATE inventory SET name = ?, amount = ?, active = ?, stock = ? WHERE id = ?";
+		String query = "UPDATE inventory SET name = ?, wholesalerPrice = ?, available = ?, stock = ? WHERE id = ?";
 
 		try (PreparedStatement ps = connection.prepareStatement(query)) {
 
 			ps.setString(1, product.getName());
-			ps.setDouble(2, product.getPublicPrice().getValue());
+			ps.setDouble(2, product.getWholesalerPrice().getValue());
 			ps.setBoolean(3, product.isAvailable());
 			ps.setInt(4, product.getStock());
 			ps.setInt(5, product.getId());
@@ -155,6 +161,5 @@ public class DaoImplJDBC implements Dao {
 				e.printStackTrace();
 			}
 		}
-
 	}
 }
