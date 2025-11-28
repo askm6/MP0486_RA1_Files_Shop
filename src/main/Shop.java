@@ -106,6 +106,7 @@ public class Shop {
 
 		// load inventory from external data
 		shop.loadInventory();
+		shop.showInventory();
 		
 		// init session as employee
 		shop.initSession();
