@@ -9,8 +9,8 @@ public class Employee extends Person implements Logable{
 	// connection using JDBC SQL
 	private Dao dao = new DaoImplJDBC();
 	
-//	public static final int USER = 123;
-//	public static final String PASSWORD = "test";
+	public static final int USER = 123;
+	public static final String PASSWORD = "test";
 	
 	public Employee(String name) {
 		super(name);
@@ -60,21 +60,21 @@ public class Employee extends Person implements Logable{
 	 */
 	@Override
 	public boolean login(int user, String password) {
-//		if (USER == user && PASSWORD.equals(password)) {
-//			return true;
-//		} 
+		if (USER == user && PASSWORD.equals(password)) {
+			return true;
+		} 
 		boolean success = false;
 		
 		// connect to data
-		dao.connect();
+//		dao.connect();
 		
 		// get employee data
-		if(dao.getEmployee(user, password) != null) {
-			success =  true;
-		}
+//		if(dao.getEmployee(user, password) != null) {
+//			success =  true;
+//		}
 		
 		// disconnect data
-		dao.disconnect();
+//		dao.disconnect();
 		return success;
 	}
 
