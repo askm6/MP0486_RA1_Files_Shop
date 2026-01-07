@@ -19,6 +19,7 @@ import java.util.Scanner;
 
 import dao.Dao;
 import dao.DaoImplFile;
+import dao.DaoImplHibernate;
 import dao.DaoImplJDBC;
 
 public class Shop {
@@ -32,7 +33,7 @@ public class Shop {
 
 	final static double TAX_RATE = 1.04;
 	
-	private Dao dao = new DaoImplJDBC();
+	private Dao dao = new DaoImplHibernate();
 
 	public Shop() {
 		inventory = new ArrayList<Product>();
