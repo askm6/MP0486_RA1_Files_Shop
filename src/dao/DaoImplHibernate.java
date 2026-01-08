@@ -27,6 +27,7 @@ import org.hibernate.query.Query;
 import model.Amount;
 import model.Employee;
 import model.Product;
+import model.ProductHistory;
 import model.Sale;
 import main.Shop;
 
@@ -81,7 +82,27 @@ public class DaoImplHibernate implements Dao {
 
 	@Override
 	public boolean writeInventory(ArrayList<Product> inventory) {
-		// TODO Auto-generated method stub
+		try {
+	        if (session == null || !session.isOpen()) {
+	            connect();
+	        }
+
+	        tx = session.beginTransaction();
+
+	        for (Product p : inventory) {
+	            ProductHistory ph = new ProductHistory(p);
+	            session.save(ph);
+	        }
+
+	        tx.commit();
+	        return true;
+
+	    } catch (HibernateException e) {
+	        if (tx != null) tx.rollback();
+	        e.printStackTrace();
+	    } finally {
+	        disconnect();
+	    }
 		return false;
 	}
 
