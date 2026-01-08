@@ -138,7 +138,26 @@ public class DaoImplHibernate implements Dao {
 
 	@Override
 	public void deleteProduct(int productId) {
-		// TODO Auto-generated method stub
+		try {
+	        if (session == null || !session.isOpen()) {
+	            connect();
+	        }
+
+	        tx = session.beginTransaction();
+
+	        Product p = session.get(Product.class, productId);
+	        if (p != null) {
+	            session.remove(p);
+	        }
+
+	        tx.commit();
+
+	    } catch (HibernateException e) {
+	        if (tx != null) tx.rollback();
+	        e.printStackTrace();
+	    } finally {
+	        disconnect();
+	    }
 		
 	}
 
