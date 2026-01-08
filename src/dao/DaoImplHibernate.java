@@ -67,7 +67,6 @@ public class DaoImplHibernate implements Dao {
 			inventory.addAll(productsList);
 
 			tx.commit();
-			System.out.println("Get All Successfully.");
 
 		} catch (HibernateException e) {
 			if (tx != null)
@@ -92,8 +91,23 @@ public class DaoImplHibernate implements Dao {
 
 	@Override
 	public void addProduct(Product product) {
-		// TODO Auto-generated method stub
-		
+		try {
+			if (session == null || !session.isOpen()) {
+	            connect();
+	        }
+			
+			tx = session.beginTransaction();
+			
+			//we save the product object on database
+			session.save(product);
+			
+			tx.commit();
+
+		} catch (HibernateException e) {
+			if (tx != null)
+				tx.rollback(); // Roll back if any exception occurs.
+			e.printStackTrace();
+		}
 	}
 
 	@Override
