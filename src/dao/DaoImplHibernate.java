@@ -72,7 +72,9 @@ public class DaoImplHibernate implements Dao {
 			if (tx != null)
 				tx.rollback(); // Roll back if any exception occurs.
 			e.printStackTrace();
-		}
+		} finally {
+	        disconnect();
+	    }
 
 		return inventory;
 	}
@@ -107,13 +109,31 @@ public class DaoImplHibernate implements Dao {
 			if (tx != null)
 				tx.rollback(); // Roll back if any exception occurs.
 			e.printStackTrace();
-		}
+		} finally {
+	        disconnect();
+	    }
 	}
 
 	@Override
 	public void updateProduct(Product product) {
-		// TODO Auto-generated method stub
-		
+		try {
+			if (session == null || !session.isOpen()) {
+	            connect();
+	        }
+			
+			tx = session.beginTransaction();
+			
+			session.update(product);
+			
+			tx.commit();
+
+		} catch (HibernateException e) {
+			if (tx != null)
+				tx.rollback(); // Roll back if any exception occurs.
+			e.printStackTrace();
+		} finally {
+	        disconnect();
+	    }
 	}
 
 	@Override
@@ -124,8 +144,9 @@ public class DaoImplHibernate implements Dao {
 
 	@Override
 	public void disconnect() {
-	    if (session != null && session.isOpen()) session.close();
-	    if (sessionFactory != null && !sessionFactory.isClosed()) sessionFactory.close();
+		if (session != null && session.isOpen()) {
+	        session.close();
+	    }
 	}
 
 
