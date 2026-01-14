@@ -36,26 +36,24 @@ public class DaoImplHibernate implements Dao {
 	private Session session;
 	private Transaction tx;
 
-
 	@Override
 	public void connect() {
-	    if (sessionFactory == null) {
-	        sessionFactory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
-	    }
-	    if (session == null || !session.isOpen()) {
-	        session = sessionFactory.openSession();
-	    }
+		if (sessionFactory == null) {
+			sessionFactory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
+		}
+		if (session == null || !session.isOpen()) {
+			session = sessionFactory.openSession();
+		}
 	}
-
 
 	@Override
 	public ArrayList<Product> getInventory() {
-        ArrayList<Product> inventory = new ArrayList<>();
+		ArrayList<Product> inventory = new ArrayList<>();
 
 		try {
 			if (session == null || !session.isOpen()) {
-	            connect();
-	        }
+				connect();
+			}
 			tx = session.beginTransaction();
 
 			// We create a manual query. Remember that "*" does not exist
@@ -74,8 +72,8 @@ public class DaoImplHibernate implements Dao {
 				tx.rollback(); // Roll back if any exception occurs.
 			e.printStackTrace();
 		} finally {
-	        disconnect();
-	    }
+			disconnect();
+		}
 
 		return inventory;
 	}
@@ -83,47 +81,71 @@ public class DaoImplHibernate implements Dao {
 	@Override
 	public boolean writeInventory(ArrayList<Product> inventory) {
 		try {
-	        if (session == null || !session.isOpen()) {
-	            connect();
-	        }
+			if (session == null || !session.isOpen()) {
+				connect();
+			}
 
-	        tx = session.beginTransaction();
+			tx = session.beginTransaction();
 
-	        for (Product p : inventory) {
-	            ProductHistory ph = new ProductHistory(p);
-	            session.save(ph);
-	        }
+			for (Product p : inventory) {
+				ProductHistory ph = new ProductHistory(p);
+				session.save(ph);
+			}
 
-	        tx.commit();
-	        return true;
+			tx.commit();
+			return true;
 
-	    } catch (HibernateException e) {
-	        if (tx != null) tx.rollback();
-	        e.printStackTrace();
-	    } finally {
-	        disconnect();
-	    }
+		} catch (HibernateException e) {
+			if (tx != null)
+				tx.rollback();
+			e.printStackTrace();
+		} finally {
+			disconnect();
+		}
 		return false;
 	}
 
 	@Override
 	public Employee getEmployee(int employeeId, String password) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			if (session == null || !session.isOpen()) {
+				connect();
+			}
+
+			tx = session.beginTransaction();
+
+			Query<Employee> q = session.createQuery(
+					"select e from Employee e where e.employeeId = :id and e.password = :pw", Employee.class);
+			q.setParameter("id", employeeId);
+			q.setParameter("pw", password);
+
+			Employee employee = q.uniqueResult();
+
+			tx.commit();
+			return employee;
+
+		} catch (HibernateException e) {
+			if (tx != null)
+				tx.rollback();
+			e.printStackTrace();
+			return null;
+		} finally {
+			disconnect();
+		}
 	}
 
 	@Override
 	public void addProduct(Product product) {
 		try {
 			if (session == null || !session.isOpen()) {
-	            connect();
-	        }
-			
+				connect();
+			}
+
 			tx = session.beginTransaction();
-			
-			//we save the product object on database
+
+			// we save the product object on database
 			session.save(product);
-			
+
 			tx.commit();
 
 		} catch (HibernateException e) {
@@ -131,21 +153,21 @@ public class DaoImplHibernate implements Dao {
 				tx.rollback(); // Roll back if any exception occurs.
 			e.printStackTrace();
 		} finally {
-	        disconnect();
-	    }
+			disconnect();
+		}
 	}
 
 	@Override
 	public void updateProduct(Product product) {
 		try {
 			if (session == null || !session.isOpen()) {
-	            connect();
-	        }
-			
+				connect();
+			}
+
 			tx = session.beginTransaction();
-			
+
 			session.update(product);
-			
+
 			tx.commit();
 
 		} catch (HibernateException e) {
@@ -153,41 +175,41 @@ public class DaoImplHibernate implements Dao {
 				tx.rollback(); // Roll back if any exception occurs.
 			e.printStackTrace();
 		} finally {
-	        disconnect();
-	    }
+			disconnect();
+		}
 	}
 
 	@Override
 	public void deleteProduct(int productId) {
 		try {
-	        if (session == null || !session.isOpen()) {
-	            connect();
-	        }
+			if (session == null || !session.isOpen()) {
+				connect();
+			}
 
-	        tx = session.beginTransaction();
+			tx = session.beginTransaction();
 
-	        Product p = session.get(Product.class, productId);
-	        if (p != null) {
-	            session.remove(p);
-	        }
+			Product p = session.get(Product.class, productId);
+			if (p != null) {
+				session.remove(p);
+			}
 
-	        tx.commit();
+			tx.commit();
 
-	    } catch (HibernateException e) {
-	        if (tx != null) tx.rollback();
-	        e.printStackTrace();
-	    } finally {
-	        disconnect();
-	    }
-		
+		} catch (HibernateException e) {
+			if (tx != null)
+				tx.rollback();
+			e.printStackTrace();
+		} finally {
+			disconnect();
+		}
+
 	}
 
 	@Override
 	public void disconnect() {
 		if (session != null && session.isOpen()) {
-	        session.close();
-	    }
+			session.close();
+		}
 	}
-
 
 }
