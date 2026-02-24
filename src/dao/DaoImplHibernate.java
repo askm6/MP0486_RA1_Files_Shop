@@ -61,6 +61,11 @@ public class DaoImplHibernate implements Dao {
 
 			// We get a List of Products
 			List<Product> productsList = q.list();
+			
+			for (Product p : productsList) {
+	            p.setWholesalerPrice(new Amount(p.getPrice()));
+	            p.setPublicPrice(new Amount(p.getPrice() * 2));
+	        }
 
 			// we add this products to our ArrayList
 			inventory.addAll(productsList);

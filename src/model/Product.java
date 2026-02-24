@@ -63,12 +63,6 @@ public class Product {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	@PostLoad
-	private void buildTransientPrices() {
-	    this.wholesalerPrice = new Amount(this.price);
-	    this.publicPrice = new Amount(this.price * 2);
-	}
 
 	public double getPrice() {
 	    return price;
