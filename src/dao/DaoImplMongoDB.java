@@ -12,6 +12,7 @@ import com.mongodb.client.MongoDatabase;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.and;
 
+import model.Amount;
 import model.Employee;
 import model.Product;
 
@@ -34,8 +35,62 @@ public class DaoImplMongoDB implements Dao {
 
 	@Override
 	public ArrayList<Product> getInventory() {
-		// TODO Auto-generated method stub
-		return null;
+	    ArrayList<Product> inventory = new ArrayList<>();
+
+	    // connect to data
+	    connect();
+
+	    try {
+	        // get collection "inventory"
+	        MongoCollection<Document> collection = database.getCollection("inventory");
+
+	        // read all documents from inventory
+	        Iterable<Document> docs = collection.find();
+
+	        // build Product objects and add to ArrayList
+	        for (Document doc : docs) {
+
+	            String name = doc.getString("name");
+
+	            // price must be stored as number (double) in Mongo
+	            Double price = doc.getDouble("price");
+	            if (price == null) {
+	                // in case it was stored as int/long, try to convert
+	                Number n = doc.get("price", Number.class);
+	                if (n != null) {
+	                    price = n.doubleValue();
+	                } else {
+	                    price = 0.0;
+	                }
+	            }
+
+	            Integer stock = doc.getInteger("stock");
+	            if (stock == null) {
+	                Number n = doc.get("stock", Number.class);
+	                if (n != null) {
+	                    stock = n.intValue();
+	                } else {
+	                    stock = 0;
+	                }
+	            }
+
+	            Boolean available = doc.getBoolean("available");
+	            if (available == null) {
+	                available = true;
+	            }
+
+	            // create Product style
+	            inventory.add(new Product(name, new Amount(price), available, stock));
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        // disconnect data
+	        disconnect();
+	    }
+
+	    return inventory;
 	}
 
 	@Override
