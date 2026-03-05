@@ -141,8 +141,29 @@ public class DaoImplMongoDB implements Dao {
 
 	@Override
 	public void addProduct(Product product) {
-		// TODO Auto-generated method stub
-		
+
+	    // connect to data
+	    connect();
+
+	    try {
+	        // get collection "inventory"
+	        MongoCollection<Document> collection = database.getCollection("inventory");
+
+	        // build document from Product object
+	        Document document = new Document("name", product.getName())
+	                .append("price", product.getWholesalerPrice().getValue())
+	                .append("stock", product.getStock())
+	                .append("available", product.isAvailable());
+
+	        // insert document into collection
+	        collection.insertOne(document);
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        // disconnect data
+	        disconnect();
+	    }
 	}
 
 	@Override
