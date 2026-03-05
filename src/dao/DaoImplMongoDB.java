@@ -37,56 +37,70 @@ public class DaoImplMongoDB implements Dao {
 
 	@Override
 	public ArrayList<Product> getInventory() {
+
 	    ArrayList<Product> inventory = new ArrayList<>();
 
 	    // connect to data
 	    connect();
 
 	    try {
+
 	        // get collection "inventory"
 	        MongoCollection<Document> collection = database.getCollection("inventory");
 
-	        // read all documents from inventory
+	        // read all documents from collection
 	        Iterable<Document> docs = collection.find();
 
-	        // build Product objects and add to ArrayList
+	        // iterate documents and convert them into Product objects
 	        for (Document doc : docs) {
 
+	            // read product id
+	            Integer id = doc.getInteger("id");
+
+	            // read product name
 	            String name = doc.getString("name");
 
-	            // price must be stored as number (double) in Mongo
-	            Double price = doc.getDouble("price");
-	            if (price == null) {
-	                // in case it was stored as int/long, try to convert
-	                Number n = doc.get("price", Number.class);
-	                if (n != null) {
-	                    price = n.doubleValue();
-	                } else {
-	                    price = 0.0;
+	            // read wholesalerPrice object
+	            Document wholesalerPriceDoc = (Document) doc.get("wholesalerPrice");
+
+	            Double value = 0.0;
+
+	            // read value from wholesalerPrice
+	            if (wholesalerPriceDoc != null) {
+	                Double temp = wholesalerPriceDoc.getDouble("value");
+	                if (temp != null) {
+	                    value = temp;
 	                }
 	            }
 
-	            Integer stock = doc.getInteger("stock");
-	            if (stock == null) {
-	                Number n = doc.get("stock", Number.class);
-	                if (n != null) {
-	                    stock = n.intValue();
-	                } else {
-	                    stock = 0;
-	                }
-	            }
-
+	            // read availability
 	            Boolean available = doc.getBoolean("available");
 	            if (available == null) {
 	                available = true;
 	            }
 
-	            // create Product style
-	            inventory.add(new Product(name, new Amount(price), available, stock));
+	            // read stock
+	            Integer stock = doc.getInteger("stock");
+	            if (stock == null) {
+	                stock = 0;
+	            }
+
+	            // create Product object
+	            Product product = new Product(name, new Amount(value), available, stock);
+
+	            // set id if present
+	            if (id != null) {
+	                product.setId(id);
+	            }
+
+	            // add product to inventory
+	            inventory.add(product);
 	        }
 
 	    } catch (Exception e) {
+	        // in case error in MongoDB
 	        e.printStackTrace();
+
 	    } finally {
 	        // disconnect data
 	        disconnect();
@@ -148,20 +162,28 @@ public class DaoImplMongoDB implements Dao {
 	    connect();
 
 	    try {
+
 	        // get collection "inventory"
 	        MongoCollection<Document> collection = database.getCollection("inventory");
 
-	        // build document from Product object
-	        Document document = new Document("name", product.getName())
-	                .append("price", product.getWholesalerPrice().getValue())
-	                .append("stock", product.getStock())
-	                .append("available", product.isAvailable());
+	        // build wholesalerPrice object
+	        Document wholesalerPriceDoc = new Document("value", product.getWholesalerPrice().getValue())
+	                .append("currency", "€");
 
-	        // insert document into collection
+	        // build document to insert
+	        Document document = new Document("id", product.getId())
+	                .append("name", product.getName())
+	                .append("wholesalerPrice", wholesalerPriceDoc)
+	                .append("available", product.isAvailable())
+	                .append("stock", product.getStock());
+
+	        // insert document into MongoDB
 	        collection.insertOne(document);
 
 	    } catch (Exception e) {
+	        // in case error in MongoDB
 	        e.printStackTrace();
+
 	    } finally {
 	        // disconnect data
 	        disconnect();
@@ -175,21 +197,33 @@ public class DaoImplMongoDB implements Dao {
 	    connect();
 
 	    try {
+
 	        // get collection "inventory"
 	        MongoCollection<Document> collection = database.getCollection("inventory");
 
-	        // update fields of product
-	        collection.updateOne(
-	                eq("name", product.getName()),
-	                combine(
-	                        set("price", product.getWholesalerPrice().getValue()),
-	                        set("stock", product.getStock()),
-	                        set("available", product.isAvailable())
-	                )
-	        );
+	        // filter to find the product by id
+	        Document filter = new Document("id", product.getId());
+
+	        // build wholesalerPrice object
+	        Document wholesalerPriceDoc = new Document("value", product.getWholesalerPrice().getValue())
+	                .append("currency", "€");
+
+	        // fields to update
+	        Document updatedValues = new Document("name", product.getName())
+	                .append("wholesalerPrice", wholesalerPriceDoc)
+	                .append("available", product.isAvailable())
+	                .append("stock", product.getStock());
+
+	        // MongoDB update operation
+	        Document updateOperation = new Document("$set", updatedValues);
+
+	        // execute update
+	        collection.updateOne(filter, updateOperation);
 
 	    } catch (Exception e) {
+	        // in case error in MongoDB
 	        e.printStackTrace();
+
 	    } finally {
 	        // disconnect data
 	        disconnect();
@@ -198,8 +232,29 @@ public class DaoImplMongoDB implements Dao {
 
 	@Override
 	public void deleteProduct(int productId) {
-		// TODO Auto-generated method stub
-		
+
+	    // connect to data
+	    connect();
+
+	    try {
+
+	        // get collection "inventory"
+	        MongoCollection<Document> collection = database.getCollection("inventory");
+
+	        // filter to find the product by id
+	        Document filter = new Document("id", productId);
+
+	        // delete document from MongoDB
+	        collection.deleteOne(filter);
+
+	    } catch (Exception e) {
+	        // in case error in MongoDB
+	        e.printStackTrace();
+
+	    } finally {
+	        // disconnect data
+	        disconnect();
+	    }
 	}
 
 	@Override
