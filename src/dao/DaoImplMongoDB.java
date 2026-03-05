@@ -111,8 +111,45 @@ public class DaoImplMongoDB implements Dao {
 
 	@Override
 	public boolean writeInventory(ArrayList<Product> inventory) {
-		// TODO Auto-generated method stub
-		return false;
+
+	    // connect to data
+	    connect();
+
+	    try {
+
+	        // get collection "historical_inventory"
+	        MongoCollection<Document> collection = database.getCollection("historical_inventory");
+
+	        // insert each product as a new historical document
+	        for (Product product : inventory) {
+
+	            // build wholesalerPrice object
+	            Document wholesalerPriceDoc = new Document("value", product.getWholesalerPrice().getValue())
+	                    .append("currency", "€");
+
+	            // build historical document
+	            Document document = new Document("id", product.getId())
+	                    .append("name", product.getName())
+	                    .append("wholesalerPrice", wholesalerPriceDoc)
+	                    .append("available", product.isAvailable())
+	                    .append("stock", product.getStock())
+	                    .append("created_at", new java.util.Date());
+
+	            // insert into historical inventory collection
+	            collection.insertOne(document);
+	        }
+
+	        return true;
+
+	    } catch (Exception e) {
+	        // in case error in MongoDB
+	        e.printStackTrace();
+	        return false;
+
+	    } finally {
+	        // disconnect data
+	        disconnect();
+	    }
 	}
 
 	@Override
@@ -124,7 +161,7 @@ public class DaoImplMongoDB implements Dao {
 
 		try {
 			// get employee collection
-			MongoCollection<Document> collection = database.getCollection("employee");
+			MongoCollection<Document> collection = database.getCollection("users");
 
 			// find employee by employeeId AND password
 			Document doc = collection.find(
