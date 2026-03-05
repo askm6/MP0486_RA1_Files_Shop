@@ -11,6 +11,8 @@ import com.mongodb.client.MongoDatabase;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Updates.set;
+import static com.mongodb.client.model.Updates.combine;
 
 import model.Amount;
 import model.Employee;
@@ -168,8 +170,30 @@ public class DaoImplMongoDB implements Dao {
 
 	@Override
 	public void updateProduct(Product product) {
-		// TODO Auto-generated method stub
-		
+
+	    // connect to data
+	    connect();
+
+	    try {
+	        // get collection "inventory"
+	        MongoCollection<Document> collection = database.getCollection("inventory");
+
+	        // update fields of product
+	        collection.updateOne(
+	                eq("name", product.getName()),
+	                combine(
+	                        set("price", product.getWholesalerPrice().getValue()),
+	                        set("stock", product.getStock()),
+	                        set("available", product.isAvailable())
+	                )
+	        );
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        // disconnect data
+	        disconnect();
+	    }
 	}
 
 	@Override
