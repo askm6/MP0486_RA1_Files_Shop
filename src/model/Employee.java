@@ -12,9 +12,9 @@ import javax.persistence.Transient;
 
 import dao.*;
 
-@Entity
-@Table(name="employee")
-public class Employee extends Person implements Logable{
+@Entity(name = "users")
+@Table(name = "users")
+public class Employee extends Person implements Logable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
@@ -26,21 +26,21 @@ public class Employee extends Person implements Logable{
 	private Dao dao = new DaoImplObjectDB();
 	public static final int USER = 123;
 	public static final String PASSWORD = "test";
-	
+
 	public Employee(String name) {
 		super(name);
 	}
-	
+
 	public Employee(int employeeId, String name, String password) {
 		super(name);
 		this.employeeId = employeeId;
 		this.password = password;
 	}
-	
+
 	public Employee() {
 		super();
 	}
-	
+
 	/**
 	 * @return the employeeId
 	 */
@@ -79,15 +79,15 @@ public class Employee extends Person implements Logable{
 //			return true;
 //		} 
 		boolean success = false;
-		
+
 		// connect to data
 		dao.connect();
-		
+
 		// get employee data
-		if(dao.getEmployee(user, password) != null) {
-			success =  true;
+		if (dao.getEmployee(user, password) != null) {
+			success = true;
 		}
-		
+
 		// disconnect data
 		dao.disconnect();
 		return success;
