@@ -86,7 +86,9 @@ public class Product {
 
 	public void setWholesalerPrice(Amount wholesalerPrice) {
 		this.wholesalerPrice = wholesalerPrice;
-	    setPrice(wholesalerPrice.getValue());
+		if (wholesalerPrice != null) {
+			setPrice(wholesalerPrice.getValue());
+		}
 	}
 
 	public boolean isAvailable() {
