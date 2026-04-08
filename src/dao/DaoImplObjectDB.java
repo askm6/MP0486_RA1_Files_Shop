@@ -92,6 +92,16 @@ public class DaoImplObjectDB implements Dao {
 	    connect();
 
 	    try {
+	    	// get current product id
+	        int newId = product.getId();
+
+	        // find next free id if current one already exists
+	        while (em.find(Product.class, newId) != null) {
+	            newId++;
+	        }
+
+	        product.setId(newId);
+	        
 	        // begin transaction
 	        em.getTransaction().begin();
 
@@ -146,8 +156,36 @@ public class DaoImplObjectDB implements Dao {
 
 	@Override
 	public void deleteProduct(int productId) {
-		// TODO Auto-generated method stub
+		// connect to data
+	    connect();
 
+	    try {
+	        // begin transaction
+	        em.getTransaction().begin();
+
+	        // find product by id
+	        Product product = em.find(Product.class, productId);
+
+	        // delete product if exists
+	        if (product != null) {
+	            em.remove(product);
+	        }
+
+	        // commit transaction
+	        em.getTransaction().commit();
+
+	    } catch (Exception e) {
+	        // in case error in ObjectDB
+	        e.printStackTrace();
+
+	        if (em.getTransaction().isActive()) {
+	            em.getTransaction().rollback();
+	        }
+
+	    } finally {
+	        // disconnect data
+	        disconnect();
+	    }
 	}
 
 	@Override
