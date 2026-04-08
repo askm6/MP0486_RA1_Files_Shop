@@ -5,6 +5,12 @@
 	<groupId>dam1_m03_uf6_jdbc_shop_solved</groupId>
 	<artifactId>dam1_m03_uf6_jdbc_shop_solved</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<repositories>
+	  <repository>
+	    <id>objectdb</id>
+	    <url>https://m2.objectdb.com</url>
+	  </repository>
+	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>mysql</groupId>
@@ -21,6 +27,11 @@
 		    <groupId>org.mongodb</groupId>
 		    <artifactId>mongo-java-driver</artifactId>
 		    <version>3.10.2</version>
+		</dependency>
+		<dependency>
+		  <groupId>com.objectdb</groupId>
+		  <artifactId>objectdb</artifactId>
+		  <version>2.9.2</version>
 		</dependency>
 	</dependencies>
 	<build>

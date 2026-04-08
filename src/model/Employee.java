@@ -23,10 +23,8 @@ public class Employee extends Person implements Logable{
 	private String password;
 	// connection using JDBC SQL
 	@Transient
-	private Dao dao = new DaoImplMongoDB();
-	@Transient
+	private Dao dao = new DaoImplObjectDB();
 	public static final int USER = 123;
-	@Transient
 	public static final String PASSWORD = "test";
 	
 	public Employee(String name) {
