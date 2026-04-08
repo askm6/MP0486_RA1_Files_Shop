@@ -7,6 +7,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
+import model.Amount;
 import model.Employee;
 import model.Product;
 
@@ -40,6 +41,11 @@ public class DaoImplObjectDB implements Dao {
 	        );
 
 	        inventory.addAll(query.getResultList());
+	        
+	        for (Product product : inventory) {
+	            product.setWholesalerPrice(new Amount(product.getPrice()));
+	            product.setPublicPrice(new Amount(product.getPrice() * 2));
+	        }
 
 	    } catch (Exception e) {
 	        // in case error in ObjectDB
@@ -111,8 +117,31 @@ public class DaoImplObjectDB implements Dao {
 
 	@Override
 	public void updateProduct(Product product) {
-		// TODO Auto-generated method stub
+		// connect to data
+	    connect();
 
+	    try {
+	        // begin transaction
+	        em.getTransaction().begin();
+
+	        // update product object in ObjectDB
+	        em.merge(product);
+
+	        // commit transaction
+	        em.getTransaction().commit();
+
+	    } catch (Exception e) {
+	        // in case error in ObjectDB
+	        e.printStackTrace();
+
+	        if (em.getTransaction().isActive()) {
+	            em.getTransaction().rollback();
+	        }
+
+	    } finally {
+	        // disconnect data
+	        disconnect();
+	    }
 	}
 
 	@Override
