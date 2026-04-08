@@ -10,6 +10,7 @@ import javax.persistence.TypedQuery;
 import model.Amount;
 import model.Employee;
 import model.Product;
+import model.ProductHistory;
 
 public class DaoImplObjectDB implements Dao {
 
@@ -18,12 +19,15 @@ public class DaoImplObjectDB implements Dao {
 
 	@Override
 	public void connect() {
-		if (emf == null || !emf.isOpen()) {
-			emf = Persistence.createEntityManagerFactory("$objectdb/db/objects/shop.odb");
-		}
-		if (em == null || !em.isOpen()) {
-			em = emf.createEntityManager();
-		}
+	    String dbPath = System.getProperty("user.dir") + "\\objects\\shop.odb";
+	    System.out.println("DAO DB PATH: " + dbPath);
+
+	    if (emf == null || !emf.isOpen()) {
+	        emf = Persistence.createEntityManagerFactory(dbPath);
+	    }
+	    if (em == null || !em.isOpen()) {
+	        em = emf.createEntityManager();
+	    }
 	}
 
 	@Override
@@ -61,15 +65,42 @@ public class DaoImplObjectDB implements Dao {
 
 	@Override
 	public boolean writeInventory(ArrayList<Product> inventory) {
-		// TODO Auto-generated method stub
-		return false;
+		// connect to data
+	    connect();
+
+	    try {
+	        // begin transaction
+	        em.getTransaction().begin();
+
+	        // persist each product as historical record
+	        for (Product product : inventory) {
+	            ProductHistory productHistory = new ProductHistory(product);
+	            em.persist(productHistory);
+	        }
+
+	        // commit transaction
+	        em.getTransaction().commit();
+	        return true;
+
+	    } catch (Exception e) {
+	        // in case error in ObjectDB
+	        e.printStackTrace();
+
+	        if (em.getTransaction().isActive()) {
+	            em.getTransaction().rollback();
+	        }
+
+	        return false;
+
+	    } finally {
+	        // disconnect data
+	        disconnect();
+	    }
 	}
 
 	@Override
 	public Employee getEmployee(int employeeId, String password) {
 		Employee employee = null;
-
-		connect();
 
 		try {
 			employee = em
@@ -79,10 +110,8 @@ public class DaoImplObjectDB implements Dao {
 
 		} catch (Exception e) {
 			employee = null;
-		} finally {
-			disconnect();
 		}
-
+		
 		return employee;
 	}
 
