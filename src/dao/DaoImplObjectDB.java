@@ -35,7 +35,7 @@ public class DaoImplObjectDB implements Dao {
 	    try {
 	        // read all Product objects from ObjectDB
 	        TypedQuery<Product> query = em.createQuery(
-	                "SELECT p FROM Product p",
+	                "SELECT p FROM inventory p",
 	                Product.class
 	        );
 
@@ -67,7 +67,7 @@ public class DaoImplObjectDB implements Dao {
 
 		try {
 			employee = em
-					.createQuery("SELECT e FROM Employee e WHERE e.employeeId = :id AND e.password = :pw",
+					.createQuery("SELECT u FROM users u WHERE u.employeeId = :id AND u.password = :pw",
 							Employee.class)
 					.setParameter("id", employeeId).setParameter("pw", password).getSingleResult();
 
@@ -82,8 +82,31 @@ public class DaoImplObjectDB implements Dao {
 
 	@Override
 	public void addProduct(Product product) {
-		// TODO Auto-generated method stub
+		 // connect to data
+	    connect();
 
+	    try {
+	        // begin transaction
+	        em.getTransaction().begin();
+
+	        // persist product object in ObjectDB
+	        em.persist(product);
+
+	        // commit transaction
+	        em.getTransaction().commit();
+
+	    } catch (Exception e) {
+	        // in case error in ObjectDB
+	        e.printStackTrace();
+
+	        if (em.getTransaction().isActive()) {
+	            em.getTransaction().rollback();
+	        }
+
+	    } finally {
+	        // disconnect data
+	        disconnect();
+	    }
 	}
 
 	@Override

@@ -9,7 +9,7 @@ import javax.persistence.PostLoad;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-@Entity
+@Entity(name = "inventory")
 @Table(name = "inventory")
 public class Product {
 	@Id
@@ -28,10 +28,8 @@ public class Product {
     private boolean available;
     @Column
     private int stock;
-    @Transient
     private static int totalProducts;
     
-    @Transient
     public final static double EXPIRATION_RATE=0.60;
     
     public Product() {}
