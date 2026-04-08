@@ -16,7 +16,6 @@ import dao.*;
 @Table(name = "users")
 public class Employee extends Person implements Logable {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private int employeeId;
 	@Column
