@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 
 import model.Employee;
 import model.Product;
@@ -26,8 +27,30 @@ public class DaoImplObjectDB implements Dao {
 
 	@Override
 	public ArrayList<Product> getInventory() {
-		// TODO Auto-generated method stub
-		return null;
+	    ArrayList<Product> inventory = new ArrayList<>();
+
+	    // connect to data
+	    connect();
+
+	    try {
+	        // read all Product objects from ObjectDB
+	        TypedQuery<Product> query = em.createQuery(
+	                "SELECT p FROM Product p",
+	                Product.class
+	        );
+
+	        inventory.addAll(query.getResultList());
+
+	    } catch (Exception e) {
+	        // in case error in ObjectDB
+	        e.printStackTrace();
+
+	    } finally {
+	        // disconnect data
+	        disconnect();
+	    }
+
+	    return inventory;
 	}
 
 	@Override
