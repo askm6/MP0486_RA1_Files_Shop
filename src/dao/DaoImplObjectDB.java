@@ -19,7 +19,18 @@ public class DaoImplObjectDB implements Dao {
 
 	@Override
 	public void connect() {
-	    String dbPath = System.getProperty("user.dir") + "\\objects\\shop.odb";
+	    java.io.File objectsFolder = new java.io.File(
+	            System.getProperty("user.dir") + java.io.File.separator + "objects"
+	    );
+
+	    if (!objectsFolder.exists()) {
+	        objectsFolder.mkdirs();
+	    }
+
+	    String dbPath = objectsFolder.getAbsolutePath()
+	            + java.io.File.separator
+	            + "shop.odb";
+
 	    System.out.println("DAO DB PATH: " + dbPath);
 
 	    if (emf == null || !emf.isOpen()) {
@@ -100,19 +111,22 @@ public class DaoImplObjectDB implements Dao {
 
 	@Override
 	public Employee getEmployee(int employeeId, String password) {
-		Employee employee = null;
+	    Employee employee = null;
 
-		try {
-			employee = em
-					.createQuery("SELECT u FROM users u WHERE u.employeeId = :id AND u.password = :pw",
-							Employee.class)
-					.setParameter("id", employeeId).setParameter("pw", password).getSingleResult();
+	    try {
+	        employee = em.find(Employee.class, employeeId);
 
-		} catch (Exception e) {
-			employee = null;
-		}
-		
-		return employee;
+	        if (employee != null) {
+	            if (!employee.getPassword().equals(password)) {
+	                employee = null;
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        employee = null;
+	    }
+
+	    return employee;
 	}
 
 	@Override
@@ -219,12 +233,14 @@ public class DaoImplObjectDB implements Dao {
 
 	@Override
 	public void disconnect() {
-		if (em != null && em.isOpen()) {
-			em.close();
-		}
-		if (emf != null && emf.isOpen()) {
-			emf.close();
-		}
-	}
+	    if (em != null && em.isOpen()) {
+	        em.close();
+	    }
+	    if (emf != null && emf.isOpen()) {
+	        emf.close();
+	    }
 
+	    em = null;
+	    emf = null;
+	}
 }
